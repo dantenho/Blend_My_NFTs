@@ -1,17 +1,18 @@
-import bpy
-import os
-import sys
-import json
 import copy
+import json
 import logging
-import tempfile
+import os
 import platform
+import sys
+import tempfile
 import traceback
-from time import sleep
-from itertools import cycle
-from threading import Thread
-from shutil import get_terminal_size
 from collections import Counter, defaultdict
+from itertools import cycle
+from shutil import get_terminal_size
+from threading import Thread
+from time import sleep
+
+import bpy
 
 log = logging.getLogger(__name__)
 
@@ -32,11 +33,13 @@ def remove_file_by_extension(dirlist):
     """
 
     if str(type(dirlist)) == "<class 'list'>":
-        dirlist = list(dirlist)  # converts single string path to list if dir pasted as string
+        dirlist = list(
+            dirlist
+        )  # converts single string path to list if dir pasted as string
 
     return_dirs = []
     for directory in dirlist:
-        if not str(os.path.split(directory)[1]) in removeList:
+        if str(os.path.split(directory)[1]) not in removeList:
             return_dirs.append(directory)
 
     return return_dirs
@@ -44,15 +47,16 @@ def remove_file_by_extension(dirlist):
 
 # TODO: fix colours in console logs and find a way to include coloured text in .txt file.
 
+
 class TextColors:
     """
     The colour of console messages.
     """
 
-    OK = '\033[92m'  # GREEN
-    WARNING = '\033[93m'  # YELLOW
-    ERROR = '\033[91m'  # RED
-    RESET = '\033[0m'  # RESET COLOR
+    OK = "\033[92m"  # GREEN
+    WARNING = "\033[93m"  # YELLOW
+    ERROR = "\033[91m"  # RED
+    RESET = "\033[0m"  # RESET COLOR
 
 
 def save_result(result):
@@ -61,14 +65,14 @@ def save_result(result):
     """
     file_name = "log.json"
     if platform.system() == "Linux" or platform.system() == "Darwin":
-        path = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', file_name)
+        path = os.path.join(os.path.join(os.path.expanduser("~")), "Desktop", file_name)
 
     if platform.system() == "Windows":
         path = os.path.join(os.environ["HOMEPATH"], "Desktop", file_name)
 
     data = json.dumps(result, indent=1, ensure_ascii=True)
-    with open(path, 'w') as outfile:
-        outfile.write(data + '\n')
+    with open(path, "w") as outfile:
+        outfile.write(data + "\n")
 
 
 # ======== GET COMBINATIONS ======== #
@@ -134,7 +138,9 @@ def get_hierarchy():
     for i in range(len(list_all_collections)):
         filter_num()
 
-    attribute_variants = [x for x in list_all_collections if x not in attribute_collections]
+    attribute_variants = [
+        x for x in list_all_collections if x not in attribute_collections
+    ]
     attribute_collections1 = copy.deepcopy(attribute_collections)
 
     def attribute_data(att_vars):
@@ -146,11 +152,11 @@ def get_hierarchy():
             # Check if name follows naming conventions:
             if int(i.count("_")) > 2 and int(i.split("_")[1]) > 0:
                 log.error(
-                        f"\n{traceback.format_exc()}"
-                        f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                        f"There is a naming issue with the following Attribute/Variant: '{i}'\n"
-                        f"Review the naming convention of Attribute and Variant collections here:\n{TextColors.RESET}"
-                        f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
+                    f"\n{traceback.format_exc()}"
+                    f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+                    f"There is a naming issue with the following Attribute/Variant: '{i}'\n"
+                    f"Review the naming convention of Attribute and Variant collections here:\n{TextColors.RESET}"
+                    f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
                 )
                 raise Exception()
 
@@ -160,11 +166,11 @@ def get_hierarchy():
                 rarity = i.split("_")[2]
             except IndexError:
                 log.error(
-                        f"\n{traceback.format_exc()}"
-                        f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                        f"There is a naming issue with the following Attribute/Variant: '{i}'\n"
-                        f"Review the naming convention of Attribute and Variant collections here:\n{TextColors.RESET}"
-                        f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
+                    f"\n{traceback.format_exc()}"
+                    f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+                    f"There is a naming issue with the following Attribute/Variant: '{i}'\n"
+                    f"Review the naming convention of Attribute and Variant collections here:\n{TextColors.RESET}"
+                    f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
                 )
                 raise Exception()
 
@@ -193,6 +199,7 @@ def get_hierarchy():
 # ======== GET COMBINATIONS ======== #
 
 # This section is used to get the number of combinations for checks and the UI display
+
 
 def get_combinations():
     """
@@ -226,15 +233,22 @@ def get_combinations():
 # This section is provided for transparency. The accuracy of the rarity values you set in your .blend file as outlined
 # in the README.md file are dependent on the maxNFTs, and the maximum number of combinations of your NFT collection.
 
+
 def check_scene():  # Not complete
     """
     Checks if Blender file Scene follows the Blend_My_NFTs conventions. If not, raises error with all instances of
     violations.
     """
 
-    script_ignore_exists = None  # True if Script_Ignore collection exists in Blender scene
-    attribute_naming_conventions = None  # True if all attributes in Blender scene follow BMNFTs naming conventions
-    variant_naming_conventions = None  # True if all variants in Blender scene follow BMNFTs naming conventions
+    script_ignore_exists = (
+        None  # True if Script_Ignore collection exists in Blender scene
+    )
+    attribute_naming_conventions = (
+        None  # True if all attributes in Blender scene follow BMNFTs naming conventions
+    )
+    variant_naming_conventions = (
+        None  # True if all variants in Blender scene follow BMNFTs naming conventions
+    )
     object_placing_conventions = None  # True if all objects are within either Script_Ignore or a variant collection
 
     # script_ignore_exists:
@@ -243,11 +257,11 @@ def check_scene():  # Not complete
         script_ignore_exists = True
     except KeyError:
         log.error(
-                f"\n{traceback.format_exc()}"
-                f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                f"Add a Script_Ignore collection to your Blender scene and ensure the name is exactly 'Script_Ignore'. "
-                f"For more information, see:"
-                f"\nhttps://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n{TextColors.RESET}"
+            f"\n{traceback.format_exc()}"
+            f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+            f"Add a Script_Ignore collection to your Blender scene and ensure the name is exactly 'Script_Ignore'. "
+            f"For more information, see:"
+            f"\nhttps://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n{TextColors.RESET}"
         )
         raise
 
@@ -295,31 +309,32 @@ def check_rarity(hierarchy, dna_list_formatted, save_path):
                 if l == k:
                     name = full_num_name[i][k]
                     num = num_dict[j][l]
-                    x[name] = [(str(round(((num / num_nfts_generated) * 100), 2)) + "%"), str(num)]
+                    x[name] = [
+                        (str(round(((num / num_nfts_generated) * 100), 2)) + "%"),
+                        str(num),
+                    ]
 
         complete_data[i] = x
 
     # Saving Rarity data to console and log:
-    x = f"\nPercentages for each Variant per Attribute:"
+    x = "\nPercentages for each Variant per Attribute:"
     for i in complete_data:
         x += f"\n\n{i}:"
         if complete_data[i]:
             for j in complete_data[i]:
                 x += f"\n - {j}: {complete_data[i][j][0]} occurs {complete_data[i][j][1]} times."
         else:
-            x += f"\n - Variants not selected."
+            x += "\n - Variants not selected."
 
     log.info(x)
 
     json_meta_data = json.dumps(complete_data, indent=1, ensure_ascii=True)
 
-    with open(os.path.join(save_path, "RarityData.json"), 'w') as outfile:
-        outfile.write(json_meta_data + '\n')
+    with open(os.path.join(save_path, "RarityData.json"), "w") as outfile:
+        outfile.write(json_meta_data + "\n")
     path = os.path.join(save_path, "RarityData.json")
 
-    log.info(
-            f"\nRarity data has been saved to:\n{path}"
-    )
+    log.info(f"\nRarity data has been saved to:\n{path}")
 
 
 def check_duplicates(dna_list_formatted):
@@ -338,10 +353,10 @@ def check_duplicates(dna_list_formatted):
 
     if duplicates > 0:
         log.warning(
-                f"\n{TextColors.WARNING}Blend_My_NFTs Warning:\n"
-                f"{duplicates} duplicate NFT DNA was detected. This should not be possible. For more information, see:"
-                f"\nhttps://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
-                f"\n{TextColors.RESET}"
+            f"\n{TextColors.WARNING}Blend_My_NFTs Warning:\n"
+            f"{duplicates} duplicate NFT DNA was detected. This should not be possible. For more information, see:"
+            f"\nhttps://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
+            f"\n{TextColors.RESET}"
         )
 
     log.info(f"\n\nDuplicate NFT DNA found: {duplicates}")
@@ -378,14 +393,14 @@ def raise_error_num_batches(max_nfts, nfts_per_batch):
         return num_batches
     except ZeroDivisionError:
         log.error(
-                f"\n{traceback.format_exc()}"
-                f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                f"The number of NFTs per Batch must be greater than ZERO."
-                f"Please review your Blender scene and ensure it follows "
-                f"the naming conventions and scene structure. For more information, "
-                f"see:\n{TextColors.RESET}"
-                f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
-                f"\n{TextColors.RESET}"
+            f"\n{traceback.format_exc()}"
+            f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+            f"The number of NFTs per Batch must be greater than ZERO."
+            f"Please review your Blender scene and ensure it follows "
+            f"the naming conventions and scene structure. For more information, "
+            f"see:\n{TextColors.RESET}"
+            f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
+            f"\n{TextColors.RESET}"
         )
         raise ZeroDivisionError()
 
@@ -394,12 +409,12 @@ def raise_error_zero_combinations():
     """Checks if combinations is greater than 0, if so, raises error."""
     if get_combinations() == 0:
         log.error(
-                f"\n{traceback.format_exc()}"
-                f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                f"The number of all possible combinations is ZERO. Please review your Blender scene and ensure it "
-                f"follows the naming conventions and scene structure. For more information, see:\n{TextColors.RESET}"
-                f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
-                f"\n{TextColors.RESET}"
+            f"\n{traceback.format_exc()}"
+            f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+            f"The number of all possible combinations is ZERO. Please review your Blender scene and ensure it "
+            f"follows the naming conventions and scene structure. For more information, see:\n{TextColors.RESET}"
+            f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
+            f"\n{TextColors.RESET}"
         )
 
         raise ValueError()
@@ -408,13 +423,13 @@ def raise_error_zero_combinations():
 def raise_error_num_batches_greater_then(num_batches):
     if num_batches < 1:
         log.error(
-                f"\n{traceback.format_exc()}"
-                f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                f"The number of Batches is less than 1. Please review your Blender scene and ensure it follows "
-                f"the naming conventions and scene structure. For more information, "
-                f"see:\n{TextColors.RESET}"
-                f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
-                f"\n{TextColors.RESET}"
+            f"\n{traceback.format_exc()}"
+            f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+            f"The number of Batches is less than 1. Please review your Blender scene and ensure it follows "
+            f"the naming conventions and scene structure. For more information, "
+            f"see:\n{TextColors.RESET}"
+            f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure"
+            f"\n{TextColors.RESET}"
         )
         raise ValueError()
 
@@ -427,10 +442,10 @@ def raise_warning_max_nfts(nfts_per_batch, collection_size):
 
     if nfts_per_batch > collection_size:
         log.error(
-                f"\n{traceback.format_exc()}"
-                f"\n{TextColors.WARNING}Blend_My_NFTs Warning:\n"
-                f"The number of NFTs Per Batch you set is smaller than the NFT Collection Size you set."
-                f"\n{TextColors.RESET}"
+            f"\n{traceback.format_exc()}"
+            f"\n{TextColors.WARNING}Blend_My_NFTs Warning:\n"
+            f"The number of NFTs Per Batch you set is smaller than the NFT Collection Size you set."
+            f"\n{TextColors.RESET}"
         )
 
         raise ValueError()
@@ -443,25 +458,25 @@ def raise_warning_collection_size(dna_list, collection_size):
 
     if len(dna_list) < collection_size:
         log.warning(
-                f"\n{traceback.format_exc()}"
-                f"\n{TextColors.WARNING} \nWARNING: \n"
-                f"Blend_My_NFTs cannot generate {collection_size} NFTs."
-                f" Only {len(dna_list)} NFT DNA were generated."
-
-                f"\nThis might be for a number of reasons:"
-                f"\n  a) Rarity is preventing combinations from being generated (See "
-                f"https://github.com/torrinworx/Blend_My_NFTs#notes-on-rarity-and-weighted-variants).\n "
-                f"\n  b) Logic is preventing combinations from being generated (See "
-                f"https://github.com/torrinworx/Blend_My_NFTs#logic).\n "
-                f"\n  c) The number of possible combinations of your NFT collection is too low. Add more Variants or "
-                f"Attributes to increase the recommended collection size.\n "
-                f"\n{TextColors.RESET}"
+            f"\n{traceback.format_exc()}"
+            f"\n{TextColors.WARNING} \nWARNING: \n"
+            f"Blend_My_NFTs cannot generate {collection_size} NFTs."
+            f" Only {len(dna_list)} NFT DNA were generated."
+            f"\nThis might be for a number of reasons:"
+            f"\n  a) Rarity is preventing combinations from being generated (See "
+            f"https://github.com/torrinworx/Blend_My_NFTs#notes-on-rarity-and-weighted-variants).\n "
+            f"\n  b) Logic is preventing combinations from being generated (See "
+            f"https://github.com/torrinworx/Blend_My_NFTs#logic).\n "
+            f"\n  c) The number of possible combinations of your NFT collection is too low. Add more Variants or "
+            f"Attributes to increase the recommended collection size.\n "
+            f"\n{TextColors.RESET}"
         )
 
 
 # ======== LOADING ANIMATION ======== #
 
 # This section is used for the loading animation used in the system console.
+
 
 class Loader:
     def __init__(self, desc="Loading...", end="Done!", timeout=0.1):
@@ -479,16 +494,16 @@ class Loader:
 
         self._thread = Thread(target=self._animate, daemon=True)
         self.steps = [
-                " [==     ]",
-                " [ ==    ]",
-                " [  ==   ]",
-                " [   ==  ]",
-                " [    == ]",
-                " [     ==]",
-                " [    == ]",
-                " [   ==  ]",
-                " [  ==   ]",
-                " [ ==    ]",
+            " [==     ]",
+            " [ ==    ]",
+            " [  ==   ]",
+            " [   ==  ]",
+            " [    == ]",
+            " [     ==]",
+            " [    == ]",
+            " [   ==  ]",
+            " [  ==   ]",
+            " [ ==    ]",
         ]
         self.done = False
 
@@ -526,12 +541,16 @@ def activate_logging():
 
     log_path = bpy.context.scene.input_tool.log_path
     if log_path:
-        file_handler = logging.FileHandler(os.path.join(log_path, 'BMNFTs_Log.txt'), 'a')
+        file_handler = logging.FileHandler(
+            os.path.join(log_path, "BMNFTs_Log.txt"), "a"
+        )
     else:
-        file_handler = logging.FileHandler(os.path.join(tempfile.gettempdir(), 'BMNFTs_Log.txt'), 'a')
+        file_handler = logging.FileHandler(
+            os.path.join(tempfile.gettempdir(), "BMNFTs_Log.txt"), "a"
+        )
 
     formatter = logging.Formatter(
-            '[%(asctime)s] [%(levelname)s] [%(filename)s > %(funcName)s() > Line:%(lineno)d]\n%(message)s\n'
+        "[%(asctime)s] [%(levelname)s] [%(filename)s > %(funcName)s() > Line:%(lineno)d]\n%(message)s\n"
     )
     file_handler.setFormatter(formatter)
 

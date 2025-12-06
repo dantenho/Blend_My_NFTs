@@ -4,16 +4,17 @@
 # Where the numbers right of the ":" are the material numbers applied to the respective Variants to the left of the ":"
 
 import json
-import random
 import logging
+import random
 import traceback
+
 from .helpers import TextColors
 
 log = logging.getLogger(__name__)
 
 
 def select_material(material_list, variant, enable_rarity):
-    """Selects a material from a passed material list. """
+    """Selects a material from a passed material list."""
     material_list_of_i = []  # List of Material names instead of order numbers
     rarity_list_of_i = []
     if_zero_bool = None
@@ -41,14 +42,16 @@ def select_material(material_list, variant, enable_rarity):
             if if_zero_bool:
                 selected_material = random.choices(material_list_of_i, k=1)
             elif not if_zero_bool:
-                selected_material = random.choices(material_list_of_i, weights=rarity_list_of_i, k=1)
+                selected_material = random.choices(
+                    material_list_of_i, weights=rarity_list_of_i, k=1
+                )
         except IndexError:
             log.error(
-                    f"\n{traceback.format_exc()}"
-                    f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                    f"An issue was found within the Material List of the Variant collection '{variant}'. For more "
-                    f"information on Blend_My_NFTs compatible scenes, see:\n{TextColors.RESET}"
-                    f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
+                f"\n{traceback.format_exc()}"
+                f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+                f"An issue was found within the Material List of the Variant collection '{variant}'. For more "
+                f"information on Blend_My_NFTs compatible scenes, see:\n{TextColors.RESET}"
+                f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
             )
             raise IndexError()
     else:
@@ -56,11 +59,11 @@ def select_material(material_list, variant, enable_rarity):
             selected_material = random.choices(material_list_of_i, k=1)
         except IndexError:
             log.error(
-                    f"\n{traceback.format_exc()}"
-                    f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
-                    f"An issue was found within the Material List of the Variant collection '{variant}'. For more "
-                    f"information on Blend_My_NFTs compatible scenes, see:\n{TextColors.RESET}"
-                    f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
+                f"\n{traceback.format_exc()}"
+                f"\n{TextColors.ERROR}Blend_My_NFTs Error:\n"
+                f"An issue was found within the Material List of the Variant collection '{variant}'. For more "
+                f"information on Blend_My_NFTs compatible scenes, see:\n{TextColors.RESET}"
+                f"https://github.com/torrinworx/Blend_My_NFTs#blender-file-organization-and-structure\n"
             )
             raise IndexError()
 
@@ -86,7 +89,7 @@ def match_dna_to_variant(hierarchy, single_dna):
     """
 
     list_attributes = list(hierarchy.keys())
-    list_dna_decunstructed = single_dna.split('-')
+    list_dna_decunstructed = single_dna.split("-")
     dna_dictionary = {}
 
     for i, j in zip(list_attributes, list_dna_decunstructed):
@@ -116,13 +119,20 @@ def apply_materials(hierarchy, single_dna, materials_file, enable_rarity):
         complete = False
         for b in materials_file:
             if single_dna_dict[a] == b:
-                material_name, material_list, = select_material(materials_file[b]['Material List'], b, enable_rarity)
+                (
+                    material_name,
+                    material_list,
+                ) = select_material(
+                    materials_file[b]["Material List"], b, enable_rarity
+                )
 
                 # Gets the Order Number of the Material
-				# We add 1 to the index because 0 is what we return on an invalid lookup. 
-				# If we don't add 1 then when material index 0 is chosen randomly we will not change materials, 
-				# and conversly the last material in the list will never show up
-                material_order_num = (list(material_list.keys()).index(material_name))+1
+                # We add 1 to the index because 0 is what we return on an invalid lookup.
+                # If we don't add 1 then when material index 0 is chosen randomly we will not change materials,
+                # and conversly the last material in the list will never show up
+                material_order_num = (
+                    list(material_list.keys()).index(material_name)
+                ) + 1
 
                 deconstructed_material_dna[a] = str(material_order_num)
                 complete = True
@@ -144,6 +154,6 @@ def apply_materials(hierarchy, single_dna, materials_file, enable_rarity):
     for a in deconstructed_material_dna:
         num = "-" + str(deconstructed_material_dna[a])
         material_dna += num
-    material_dna = ''.join(material_dna.split('-', 1))
+    material_dna = "".join(material_dna.split("-", 1))
 
     return f"{single_dna}:{material_dna}"

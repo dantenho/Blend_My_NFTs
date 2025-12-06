@@ -1,31 +1,29 @@
 import bpy
-
-from bpy.props import (IntProperty,
-                       BoolProperty,
-                       StringProperty,
-                       EnumProperty,
-                       CollectionProperty)
-
-from bpy.types import (Operator,
-                       Panel,
-                       PropertyGroup,
-                       UIList)
+from bpy.props import (
+    EnumProperty,
+    IntProperty,
+    StringProperty,
+)
+from bpy.types import Operator, PropertyGroup, UIList
 
 
 # ======== Operators ======== #
 class CUSTOM_OT_logic_actions(Operator):
     """Move items up and down, add and remove"""
+
     bl_idname = "logic_uilist.logic_list_action"
     bl_label = "List Actions"
     bl_description = "Move items up and down, add and remove"
-    bl_options = {'REGISTER'}
+    bl_options = {"REGISTER"}
 
     action: bpy.props.EnumProperty(
         items=(
-            ('UP', "Up", ""),
-            ('DOWN', "Down", ""),
-            ('REMOVE', "Remove", ""),
-            ('ADD', "Add", "")))
+            ("UP", "Up", ""),
+            ("DOWN", "Down", ""),
+            ("REMOVE", "Remove", ""),
+            ("ADD", "Add", ""),
+        )
+    )
 
     def invoke(self, context, event):
         scn = context.scene
@@ -36,44 +34,51 @@ class CUSTOM_OT_logic_actions(Operator):
         except IndexError:
             pass
         else:
-            if self.action == 'DOWN' and idx < len(scn.logic_fields) - 1:
+            if self.action == "DOWN" and idx < len(scn.logic_fields) - 1:
                 item_next = scn.logic_fields[idx + 1].name
                 scn.logic_fields.move(idx, idx + 1)
                 scn.logic_fields_index += 1
-                info = 'Item "%s" moved to position %d' % (item.name, scn.logic_fields_index + 1)
-                self.report({'INFO'}, info)
+                info = 'Item "%s" moved to position %d' % (
+                    item.name,
+                    scn.logic_fields_index + 1,
+                )
+                self.report({"INFO"}, info)
 
-            elif self.action == 'UP' and idx >= 1:
+            elif self.action == "UP" and idx >= 1:
                 item_prev = scn.logic_fields[idx - 1].name
                 scn.logic_fields.move(idx, idx - 1)
                 scn.logic_fields_index -= 1
-                info = 'Item "%s" moved to position %d' % (item.name, scn.logic_fields_index + 1)
-                self.report({'INFO'}, info)
+                info = 'Item "%s" moved to position %d' % (
+                    item.name,
+                    scn.logic_fields_index + 1,
+                )
+                self.report({"INFO"}, info)
 
-            elif self.action == 'REMOVE':
+            elif self.action == "REMOVE":
                 info = 'Item "%s" removed from list' % (scn.logic_fields[idx].name)
                 scn.logic_fields_index -= 1
                 scn.logic_fields.remove(idx)
-                self.report({'INFO'}, info)
+                self.report({"INFO"}, info)
 
-        if self.action == 'ADD':
+        if self.action == "ADD":
             if context.object:
                 item = scn.logic_fields.add()
                 item.name = "Rule"
                 scn.logic_fields_index = len(scn.logic_fields) - 1
                 info = '"%s" added to list' % (item.name)
-                self.report({'INFO'}, info)
+                self.report({"INFO"}, info)
             else:
-                self.report({'INFO'}, "Nothing selected in the Viewport")
+                self.report({"INFO"}, "Nothing selected in the Viewport")
         return {"FINISHED"}
 
 
 class CUSTOM_OT_logic_clearList(Operator):
     """Clear all items of the list"""
+
     bl_idname = "logic_uilist.logic_clear_list"
     bl_label = "Clear Logic Rules"
     bl_description = "Clear all items of the list"
-    bl_options = {'INTERNAL'}
+    bl_options = {"INTERNAL"}
 
     @classmethod
     def poll(cls, context):
@@ -85,15 +90,17 @@ class CUSTOM_OT_logic_clearList(Operator):
     def execute(self, context):
         if bool(context.scene.logic_fields):
             context.scene.logic_fields.clear()
-            self.report({'INFO'}, "All items removed")
+            self.report({"INFO"}, "All items removed")
         else:
-            self.report({'INFO'}, "Nothing to remove")
-        return {'FINISHED'}
+            self.report({"INFO"}, "Nothing to remove")
+        return {"FINISHED"}
 
 
 # ======== UILists ======== #
 class CUSTOM_UL_logic_items(UIList):
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+    def draw_item(
+        self, context, layout, data, item, icon, active_data, active_propname, index
+    ):
         layout = layout.split(factor=0.1)
         col = layout.column()
         col.label(text=f" Rule {index + 1}")
@@ -120,9 +127,9 @@ class CUSTOM_logic_objectCollection(PropertyGroup):
         name="Rule Type",
         description="Select the Rule Type",
         items=[
-            ('THEN', "Then", ""),
-            ('NOT', "Not", ""),
-        ]
+            ("THEN", "Then", ""),
+            ("NOT", "Not", ""),
+        ],
     )
     item_list2: StringProperty(default="Item List 2")
 
